@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - Rehoboth</title>
+
+<style>
+body {
+    font-family: Arial;
+    padding: 20px;
+    background: #f4f4f4;
+}
+
+.login, .dashboard {
+    max-width: 400px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+button {
+    padding: 10px;
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.sermon-item {
+    background: #eee;
+    padding: 10px;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login" id="loginBox">
+    <h2>Admin Login</h2>
+    <input type="password" id="password" placeholder="Enter password">
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="dashboard" id="dashboard" style="display:none;">
+    <h2>Manage Sermons</h2>
+
+    <input type="text" id="title" placeholder="Sermon Title">
+    <textarea id="desc" placeholder="Sermon Description"></textarea>
+    <button onclick="addSermon()">Add Sermon</button>
+
+    <h3>All Sermons</h3>
+    <div id="sermonList"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const ADMIN_PASSWORD = "rehoboth123";
+
+function login() {
+    const input = document.getElementById("password").value;
+    if(input === ADMIN_PASSWORD){
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        loadSermons();
+    } else {
+        alert("Wrong password");
+    }
+}
+
+async function addSermon(){
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+
+    await db.collection("sermons").add({ title, desc });
+
+    loadSermons();
+}
+
+async function loadSermons(){
+    const snapshot = await db.collection("sermons").get();
+    const container = document.getElementById("sermonList");
+
+    container.innerHTML = "";
+
+    snapshot.forEach(doc => {
+        const s = doc.data();
+        container.innerHTML += `
+            <div>
+                <h4>${s.title}</h4>
+                <p>${s.desc}</p>
+            </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>
+firebase deploy

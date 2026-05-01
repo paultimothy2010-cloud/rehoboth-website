@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rehoboth House of Prayer</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    line-height: 1.6;
+}
+
+/* NAVBAR */
+header {
+    background: #1a1a2e;
+    color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 22px;
+}
+
+nav a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #fca311;
+}
+
+/* HERO */
+.hero {
+    background: url('https://images.unsplash.com/photo-1507692049790-de58290a4334') no-repeat center/cover;
+    height: 90vh;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero h2 {
+    font-size: 40px;
+}
+
+.hero p {
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+/* SECTIONS */
+section {
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.about, .services, .sermons, .contact {
+    background: #f4f4f4;
+    margin-bottom: 20px;
+}
+
+/* SERVICE BOX */
+.service-box {
+    margin-top: 20px;
+}
+
+/* SERMON CARDS */
+.sermon-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sermon {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    width: 250px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* CONTACT */
+form input, form textarea {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+form button {
+    padding: 10px 20px;
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover {
+    background: #fca311;
+}
+
+/* FOOTER */
+footer {
+    background: #1a1a2e;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* MOBILE */
+@media(max-width: 768px) {
+    .hero h2 {
+        font-size: 28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <h1>Rehoboth House of Prayer</h1>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#about">About</a>
+        <a href="#services">ServicSes</a>
+        <a href="#sermons">Sermons</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+    <div>
+        <h2>Welcome to Rehoboth House of Global Ministry</h2>
+        <p>Theme: WINDS OF
+             TRANSFORMATION
+        </p>
+    </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+    <h2>About Us</h2>
+    <p>
+        Rehoboth House of Prayer is a Christ-centered church committed to raising believers,
+        empowering lives, and spreading the Gospel of Jesus Christ.
+    </p>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="services">
+    <h2>Service Times</h2>
+    <div class="service-box">
+        <p><strong>Sunday Service:</strong> 9:00 AM - 10:30 AM</p>
+        <p><strong>Midweek Services online:</strong> Monday 9:00 PM - 10:00 PM/
+                                                     Tuesday 9:00 PM - 10:00 PM/
+                                                     Wednesday 9:00 PM - 10:00 PM/
+                                                     Thursday 9:00 PM - 10:00 PM</p>/
+        <p><strong>Prayer Meeting:</strong> Friday 12:00PM -3:00AM </p>
+    </div>
+</section>
+
+<!-- SERMONS -->
+<section id="sermons" class="sermons">
+    <h2>Latest Sermons</h2>
+    <div class="sermon-container" id="sermonList"></div>
+</section>
+
+<script>
+function loadSermons() {
+    const sermons = JSON.parse(localStorage.getItem("sermons")) || [];
+    const container = document.getElementById("sermonList");
+
+    container.innerHTML = "";
+
+    sermons.forEach((sermon, index) => {
+        container.innerHTML += `
+            <div class="sermon">
+                <h3>${sermon.title}</h3>
+                <p>${sermon.desc}</p>
+            </div>
+        `;
+    });
+}
+
+loadSermons();
+</script>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <form onsubmit="sendMessage(event)">
+        <input type="text" placeholder="Your Name" required><br>
+        <input type="email" placeholder="Your Email" required><br>
+        <textarea placeholder="Your Message" rows="5" required></textarea><br>
+        <button type="submit">Send Message</button>
+    </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 Rehoboth House of Prayer | All Rights Reserved</p>
+</footer>
+
+<script>
+function sendMessage(e) {
+    e.preventDefault();
+    alert("Message sent successfully!");
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// LOAD SERMONS FROM DATABASE
+async function loadSermons() {
+    const snapshot = await db.collection("sermons").get();
+    const container = document.getElementById("sermonList");
+
+    container.innerHTML = "";
+
+    snapshot.forEach(doc => {
+        const sermon = doc.data();
+        container.innerHTML += `
+            <div class="sermon">
+                <h3>${sermon.title}</h3>
+                <p>${sermon.desc}</p>
+            </div>
+        `;
+    });
+}
+
+loadSermons();
+</script>
+<button onclick="payWithPaystack()">Give Offering</button>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+function payWithPaystack(){
+  let handler = PaystackPop.setup({
+    key: 'YOUR_PUBLIC_KEY',
+    email: 'timothyadeosun@email.com',
+    amount: 500000, // amount in kobo (₦5000 = 500000)
+    currency: 'NGN',
+
+    callback: function(response){
+      alert('Payment successful! Ref: ' + response.reference);
+    },
+
+    onClose: function(){
+      alert('Transaction cancelled');
+    }
+  });
+
+  handler.openIframe();
+}
+</script>
+<a href="https://wa.me/2347053564189?text=Hello%20Pastor%2C%20I%20need%20prayer"
+   class="whatsapp-btn" target="_blank">
+   💬 I need prayers 
+</a>
+
+<style>
+.whatsapp-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #25D366;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.whatsapp-btn:hover {
+    background: #1ebe5d;
+}
+</style>
+</body>
+</html>
